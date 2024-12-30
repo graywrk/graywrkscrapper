@@ -1,4 +1,6 @@
 .venv
 *.session
 members.csv
+chats.csv
 .env
+pgdata

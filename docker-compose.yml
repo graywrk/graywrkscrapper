@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    container_name: parser
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+  
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    container_name: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  pgdata: null
