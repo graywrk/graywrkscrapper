@@ -8,12 +8,12 @@ from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-if os.path.eists(dotenv_path):
+if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
-api_id = 21606053
-api_hash = '333a11a8ff82221adac0e93cd2a28d2a'
-phone = '+79215903745'
+phone = os.environ.get("phone")
+api_id = os.environ.get("api_id")
+api_hash = os.environ.get("api_hash")
 
 client = TelegramClient(phone, api_id, api_hash)
 
