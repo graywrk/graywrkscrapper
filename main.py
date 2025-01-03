@@ -23,8 +23,8 @@ client.start()
 
 class MongoDB(object):
     
-    def __init__(self, host, port, db_name, collection):
-        self._client = MongoClient(f'mongodb://{host}:{port}')
+    def __init__(self, host, port, user, password, db_name, collection):
+        self._client = MongoClient(f'mongodb://{user}:{password}@{host}:{port}')
         self._collection = self._client[db_name][collection]
     
     def create_user(self, user):
@@ -90,7 +90,8 @@ def get_all_participants(group):
 
     return all_participants
 
-def get_all_messages(group):
+def get_all_messages(group):            
+
     
     all_messages = []
     offset_id = 0
@@ -107,7 +108,8 @@ def get_all_messages(group):
             limit=limit,
             max_id=0,
             min_id=0,
-            hash=0
+            hash=0            
+
         ))
         if not history.messages:
             break
@@ -122,7 +124,8 @@ def get_all_messages(group):
 
 
 def save_participants_to_mongo(participants):
-    db = MongoDB(db_name='parser', collection='user')
+    db = MongoDB(db_name='parser', user='admin', password='password', collection='user', host='mongo', port=27017)            
+
     for user in participants:
         try:
             if user.username:
@@ -138,9 +141,6 @@ def save_participants_to_mongo(participants):
 
 groups = get_all_groups_from_chats(get_all_chats())
 
-all_participants = []
-
 for group in groups:
-    all_participants.append(get_all_participants(group))
-    
-save_participants_to_mongo(all_participants)
+    participants = get_all_participants(group)
+    save_participants_to_mongo(participants)
