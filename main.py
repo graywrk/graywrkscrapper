@@ -21,6 +21,33 @@ client = TelegramClient(phone, api_id, api_hash)
 
 client.start()
 
+class MongoDB(object):
+    
+    def __init__(self, host, port, db_name, collection):
+        self._client = MongoClient(f'mongodb://{host}:{port}')
+        self._collection = self._client[db_name][collection]
+    
+    def create_user(self, user):
+        try:
+            if self._collection.find_one({"username": user.get('username')}) == None:
+                self._collection.insert_one(user)
+        except Exception as ex:
+            print(ex)
+
+    def get_all_users(self):
+        try:
+            data = self._collection.find()
+            return data
+        except Exception as ex:
+            print(ex)
+    
+    def find_by_username(self, username):
+        try:
+            data = self._collection.find_one({"username": username})
+            return data
+        except Exception as ex:
+            print(ex)
+
 def get_all_chats():
     
     chats = []
@@ -68,7 +95,7 @@ def get_all_messages(group):
     all_messages = []
     offset_id = 0
     limit = 100
-    total_messages = 0
+    total_messages = 0    
     total_count_limit = 100
 
     while True:
@@ -94,6 +121,21 @@ def get_all_messages(group):
     return all_messages
 
 
+def save_participants_to_mongo(participants):
+    db = MongoDB(db_name='parser', collection='user')
+    for user in participants:
+        try:
+            if user.username:
+                username = user.username
+            else:
+                user.username = ""
+        except:
+            pass
+
+        db.create_user(user)
+
+
+
 groups = get_all_groups_from_chats(get_all_chats())
 
 all_participants = []
@@ -101,25 +143,4 @@ all_participants = []
 for group in groups:
     all_participants.append(get_all_participants(group))
     
-print('Сохраняем данные в файл...')
-with open("members.csv","w",encoding='UTF-8') as f:
-    writer = csv.writer(f,delimiter="|",lineterminator="\n")
-    writer.writerow(['username','name'])
-    for user in all_participants:
-        try:
-            if user.username:
-                username= user.username
-            else:
-                username= ""
-            if user.first_name:
-                first_name= user.first_name
-            else:
-                first_name= ""
-            if user.last_name:
-                last_name= user.last_name
-            else:
-                last_name= ""
-            name= (first_name + ' ' + last_name).strip()
-            writer.writerow([username,name])
-        except:
-            pass
+save_participants_to_mongo(all_participants)
