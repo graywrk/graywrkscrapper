@@ -7,6 +7,8 @@ import os
 from telethon.tl.functions.messages import GetDialogsRequest, GetHistoryRequest
 from telethon.tl.types import InputPeerEmpty, PeerChannel
 
+from pymongo import MongoClient
+
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
